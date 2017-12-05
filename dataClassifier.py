@@ -64,6 +64,58 @@ def basicFeatureExtractorFace(datum):
                 features[(x,y)] = 0
     return features
 
+# helper function
+def getLegalPixels(current):
+    x,y = current
+    legal = set()
+    if x == 0:
+        if y == 0:
+            # right and down only
+            legal.add((x+1, y))
+            legal.add((x, y+1))
+        elif y < DIGIT_DATUM_HEIGHT - 1:
+            # right, down, up
+            legal.add((x+1, y))
+            legal.add((x, y+1))
+            legal.add((x, y-1))
+        else:
+            # right, up only
+            legal.add((x+1, y))
+            legal.add((x, y-1))
+    elif x < DIGIT_DATUM_WIDTH - 1:
+        if y == 0:
+            # left, right and down only
+            legal.add((x-1, y))
+            legal.add((x+1, y))
+            legal.add((x, y+1))
+        elif y < DIGIT_DATUM_HEIGHT - 1:
+            # left, right, down, up
+            legal.add((x-1, y))
+            legal.add((x+1, y))
+            legal.add((x, y+1))
+            legal.add((x, y-1))
+        else:
+            # left, right, up only
+            legal.add((x-1, y))
+            legal.add((x+1, y))
+            legal.add((x, y-1))
+    else:
+        if y == 0:
+            # left and down only
+            legal.add((x-1, y))
+            legal.add((x, y+1))
+        elif y < DIGIT_DATUM_HEIGHT - 1:
+            # left, down, up
+            legal.add((x-1, y))
+            legal.add((x, y+1))
+            legal.add((x, y-1))
+        else:
+            # left, up only
+            legal.add((x-1, y))
+            legal.add((x, y-1))
+
+    return legal
+
 def enhancedFeatureExtractorDigit(datum):
     """
     Your feature extraction playground.
@@ -75,10 +127,82 @@ def enhancedFeatureExtractorDigit(datum):
 
     ##
     """
-    features =  basicFeatureExtractorDigit(datum)
+    #features =  basicFeatureExtractorDigit(datum)
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    region = util.Counter()
+
+    region_counter = 0
+    
+    for y in range(DIGIT_DATUM_HEIGHT):
+
+        for x in range(DIGIT_DATUM_WIDTH):
+            #print "starting point ",x,y
+            # already belongs to a region
+            if region[(x,y)] > 0:
+                #print "already belongs to region"
+                continue
+
+            # is black pixel
+            if(datum.getPixel(x,y) == 2):
+                #print "is a black pixel"
+                continue
+
+            # bfs
+            queue = util.Queue()
+            visited = set()
+            new_found = False
+
+            queue.push((x,y))
+
+            while(queue.isEmpty() == False):
+                current = queue.pop()
+                #print "popping and checking ",current
+                if current not in visited:
+                    #print "current not in visited"
+                    visited.add(current)
+                    if region[current] == 0:
+                        #print "current is 0"
+                        if new_found == False:
+                            #print "starting new region"
+                            new_found = True
+                            region_counter += 1
+                        #print "set region value to ",region_counter
+                        region[current] = region_counter
+
+                    # successors
+                    for pixel in getLegalPixels(current):
+                        pix_x,pix_y = pixel
+                        if (pixel not in visited) and (region[pixel] == 0) and (datum.getPixel(pix_x,pix_y) < 2):
+                            #print "adding to queue"
+                            queue.push(pixel)
+        #print "\n",
+
+    
+
+    # DEBUG: Prints the regions
+    '''
+    print "Region Counter: ",region_counter
+    for y in range(DIGIT_DATUM_HEIGHT):
+        for x in range(DIGIT_DATUM_WIDTH):
+            val = region[(x,y)]
+            #val = datum.getPixel(x,y)
+            if val == 0:
+                print " ",
+            else:
+                print val,
+        print "\n",
+    '''
+
+    features = util.Counter() # [1 region, 2 region, 3 region, or more]
+
+
+    for x in range(4):
+        if x == region_counter:
+            features[x] = 1
+        else:
+            features[x] = 0
 
     return features
 
