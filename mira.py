@@ -61,7 +61,35 @@ class MiraClassifier:
         representing a vector of values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for c in Cgrid:
+            for iteration in range(self.max_iterations):
+                print "Starting iteration ", iteration, "..."
+                for i in range(len(trainingData)):
+                    score = util.Counter()
+                    weight = trainingData[i]
+                    true_label = trainingLabels[i]
+                    for l in self.legalLabels:
+                        score[l] = self.weights[l] * weight
+                    guess = score.argMax()
+                    if true_label == guess:
+                        continue
+                    # else:
+                    #     self.weights[true_label] += weight
+                    #     self.weights[guess] -= weight
+                    tmp = ((self.weights[guess] - self.weights[trainingLabels[i]]) * trainingData[i] + 1.0) / ((trainingData[i]*trainingData[i])*2)
+                    tmp = min(c, tmp)
+                    for f in self.features:
+                        self.weights[trainingLabels[i]][f] = self.weights[trainingLabels[i]][f] + tmp * trainingData[i][f]
+                        self.weights[guess][f] = self.weights[guess][f] - tmp * trainingData[i][f]
+            
+            # do I need this???? it wasn't effecting the results
+            # vd = self.classify(validationData)
+            # t = 0
+            # for i in range(len(vd)):
+            #     if (vd[i] != validationLabels[i]): continue
+            #     t = t+1
+            # if t < score: continue
+            # score = t
 
     def classify(self, data ):
         """
@@ -77,5 +105,3 @@ class MiraClassifier:
                 vectors[l] = self.weights[l] * datum
             guesses.append(vectors.argMax())
         return guesses
-
-
