@@ -127,7 +127,7 @@ def enhancedFeatureExtractorDigit(datum):
 
     ##
     """
-    #features =  basicFeatureExtractorDigit(datum)
+    features =  basicFeatureExtractorDigit(datum)
 
     "*** YOUR CODE HERE ***"
 
@@ -195,18 +195,16 @@ def enhancedFeatureExtractorDigit(datum):
         print "\n",
     '''
 
-    features = util.Counter() # [1 region, 2 region, 3 region, or more]
+    num_regions = util.Counter() # [1 region, 2 region, 3 region, or more]
 
 
     for x in range(4):
         if x == region_counter:
-            features[x] = 1
+            num_regions[x] = 1
         else:
-            features[x] = 0
+            num_regions[x] = 0
 
-    return features
-
-
+    return num_regions
 
 def basicFeatureExtractorPacman(state):
     """
