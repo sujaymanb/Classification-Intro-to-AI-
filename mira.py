@@ -80,16 +80,7 @@ class MiraClassifier:
                     tmp = min(c, tmp)
                     for f in self.features:
                         self.weights[trainingLabels[i]][f] = self.weights[trainingLabels[i]][f] + tmp * trainingData[i][f]
-                        self.weights[guess][f] = self.weights[guess][f] - tmp * trainingData[i][f]
-            
-            # do I need this???? it wasn't effecting the results
-            # vd = self.classify(validationData)
-            # t = 0
-            # for i in range(len(vd)):
-            #     if (vd[i] != validationLabels[i]): continue
-            #     t = t+1
-            # if t < score: continue
-            # score = t
+                        self.weights[guess][f] = self.weights[guess][f] - tmp * trainingData[i][f]    
 
     def classify(self, data ):
         """

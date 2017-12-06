@@ -124,7 +124,8 @@ def enhancedFeatureExtractorDigit(datum):
     for this datum (datum is of type samples.Datum).
 
     ## DESCRIBE YOUR ENHANCED FEATURES HERE...
-
+    The enhanced features indicate how many 'regions' there are in the image
+    i.e. the number of regions of contiguous white/gray pixels
     ##
     """
     features =  basicFeatureExtractorDigit(datum)
@@ -149,7 +150,7 @@ def enhancedFeatureExtractorDigit(datum):
                 #print "is a black pixel"
                 continue
 
-            # bfs
+            # bfs to find contiguous region
             queue = util.Queue()
             visited = set()
             new_found = False
@@ -195,16 +196,16 @@ def enhancedFeatureExtractorDigit(datum):
         print "\n",
     '''
 
-    num_regions = util.Counter() # [1 region, 2 region, 3 region, or more]
-
+    # encoding the new features
+    num_regions = util.Counter() # [0, 1 region, 2 region, 3 region]
 
     for x in range(4):
         if x == region_counter:
-            num_regions[x] = 1
+            num_regions[str(x) + "_regions"] = 1
         else:
-            num_regions[x] = 0
+            num_regions[str(x) + "_regions"] = 0
 
-    return num_regions
+    return features + num_regions
 
 def basicFeatureExtractorPacman(state):
     """
@@ -245,8 +246,38 @@ def enhancedPacmanFeatures(state, action):
     It should return a counter with { <feature name> : <feature value>, ... }
     """
     features = util.Counter()
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    position_list = []
+    food_d = []
+    successor = state.generateSuccessor(0, action)
+
+    close_ghost = min(util.manhattanDistance(l, successor.getPacmanPosition()) for l in state.getGhostPositions())
+    if close_ghost:
+        features['close_ghost'] = close_ghost
+    else:
+        features['close_ghost'] = 0
+
+    features['food_count'] = successor.getFood().count()
+
+    all_food = successor.getFood()
+    # this loop gets all the positions of food so I can use it like the getGhostPositions func
+    for j in range(all_food.width):
+        for k in range(all_food.height):
+            if all_food[j][k] == True: position_list.append([j, k])    
+    # now that I have my food I can get the manhattan distance of both that and the ghosts
+    for food in position_list:
+        food_d.append(util.manhattanDistance(food, successor.getPacmanPosition()))
+    # add a feature for all the food
+    food_d.sort()    
+    if food_d:
+        features["food"] = min(food_d)
+    else:
+        features["food"] = 0
+
+    if action == 'Stop':
+        features["action_stop"] = 1
+    else:
+        features["action_stop"] = 0
+
     return features
 
 
