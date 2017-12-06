@@ -200,11 +200,11 @@ def enhancedFeatureExtractorDigit(datum):
 
     for x in range(4):
         if x == region_counter:
-            num_regions[x] = 1
+            num_regions[str(x) + "_regions"] = 1
         else:
-            num_regions[x] = 0
+            num_regions[str(x) + "_regions"] = 0
 
-    return num_regions
+    return features + num_regions
 
 def basicFeatureExtractorPacman(state):
     """
