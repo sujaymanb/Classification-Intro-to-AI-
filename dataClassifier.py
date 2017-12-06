@@ -124,7 +124,8 @@ def enhancedFeatureExtractorDigit(datum):
     for this datum (datum is of type samples.Datum).
 
     ## DESCRIBE YOUR ENHANCED FEATURES HERE...
-
+    The enhanced features indicate how many 'regions' there are in the image
+    i.e. the number of regions of contiguous white/gray pixels
     ##
     """
     features =  basicFeatureExtractorDigit(datum)
@@ -149,7 +150,7 @@ def enhancedFeatureExtractorDigit(datum):
                 #print "is a black pixel"
                 continue
 
-            # bfs
+            # bfs to find contiguous region
             queue = util.Queue()
             visited = set()
             new_found = False
@@ -195,8 +196,8 @@ def enhancedFeatureExtractorDigit(datum):
         print "\n",
     '''
 
-    num_regions = util.Counter() # [1 region, 2 region, 3 region, or more]
-
+    # encoding the new features
+    num_regions = util.Counter() # [0, 1 region, 2 region, 3 region]
 
     for x in range(4):
         if x == region_counter:
